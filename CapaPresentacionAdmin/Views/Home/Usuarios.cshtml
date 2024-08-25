@@ -4,5 +4,54 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Usuarios</h2>
+<ol class="breadcrumb mb-4 mt-4">
+    <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Resumen</a></li>
+    <li class="breadcrumb-item active">Usuarios</li> 
+</ol>
 
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-user me-1"></i> Lista de Usuarios
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <button type="button" class="btn btn-outline-success">
+                     Crear Nuevo Usuario
+                </button>
+            </div>
+        </div>
+        <hr />
+        <table id="tabla" class="display cell-border" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>Nombres</th>
+                    <th>Apellidos</th>
+                    <th>Correo</th>
+                    <th>Activo</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts
+    {
+    <script>
+        jQuery.ajax
+            ({
+                url: '@Url.Action("ListarUsuarios","Home")',
+                type: "Get",
+                dataType: "json",
+                contentTipe: "application/json; charset=utf-8",
+                success: function (data)
+                {
+                    debugger;
+                    
+                    console.log(data)
+                }
+            })
+    </script>
+    } 

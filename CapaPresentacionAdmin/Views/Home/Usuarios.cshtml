@@ -6,7 +6,7 @@
 
 <ol class="breadcrumb mb-4 mt-4">
     <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Resumen</a></li>
-    <li class="breadcrumb-item active">Usuarios</li> 
+    <li class="breadcrumb-item active">Usuarios</li>
 </ol>
 
 <div class="card">
@@ -16,8 +16,8 @@
     <div class="card-body">
         <div class="row">
             <div class="col-12">
-                <button type="button" class="btn btn-outline-success">
-                     Crear Nuevo Usuario
+                <button type="button" class="btn btn-outline-success" onclick="abrirModal(null)">
+                    Crear Nuevo Usuario
                 </button>
             </div>
         </div>
@@ -38,22 +38,53 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="exampleModalLabel">Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body g-2">
+                <input id="txtId" type="hidden" value="0"/>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label for="txtNombres" class="form-label">Nombres</label>
+                        <input type="text" class="form-control" id="txtNombres" placeholder="Digite solo su nombre">
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="txtApellidos" class="form-label">Apellidos</label>
+                        <input type="text" class="form-control" id="txtApellidos" placeholder="Digite solo su apellido">
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="txtCorreo" class="form-label">Correo</label>
+                        <input type="email" class="form-control" id="txtCorreo" placeholder="Prueba@email.com">
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="cboActivo" class="form-label">Usuario Activo</label>
+                        <select class="form-select" id="cboActivo">
+                            <option selected>¿Nuevo Usuario Activo?</option>
+                            <option value="1">Si</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="Guardar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section scripts
     {
     <script>
         var tablaData;
-        jQuery.ajax
-        ({
-            url: '@Url.Action("ListarUsuarios","Home")',
-            type: "GET",
-            dataType: "json",
-            contentTipe: "application/json; charset=utf-8",
-            success: function (data)
-            {
-                console.log(data)
-            }
-        })
-
+        var filaSeleccionada;
+        
         tablaData = $("#tabla").DataTable
         ({
             responsive: true,
@@ -83,13 +114,61 @@
                         }
                     },
                     {
-                        "defaultContent": '<button type="button" class="btn btn-primary btn-sm"><i class="fas fa-pen"></i></button>' +
+                        "defaultContent": '<button type="button" class="btn btn-primary btn-sm btn-editar"><i class="fas fa-pen"></i></button>' +
                             '<button type="button" class="btn btn-danger btn-sm ms-2"><i class="fas fa-trash"></i></button>',
                         "orderable": false,
                         "searchable": false,
                         "width":"90 px"
                     }
-            ]
+                ],
+            "language":
+            {
+                "url":"https://cdn.datatables.net/plug-ins/2.1.4/i18n/es-MX.json"
+            }
         });
+        function abrirModal(json)
+        {
+            $("#txtId").val(0);
+            $("#txtNombres").val("");
+            $("#txtApellidos").val("");
+            $("#txtCorreo").val("");
+            $("#cboActivo").val(1);
+
+            if (json != null)
+            {
+                $("#txtId").val(json.IdUsuario);
+                $("#txtNombres").val(json.Nombres);
+                $("#txtApellidos").val(json.Apellidos);
+                $("#txtCorreo").val(json.Correo);
+                $("#cboActivo").val(json.Activo == true ? 1 : 0);
+            }
+            $("#FormModal").modal("show");
+        }
+        $("#tabla tbody").on("click", '.btn-editar', function ()
+        {
+            filaSeleccionada = $(this).closest("tr");
+            var data = tablaData.row(filaSeleccionada).data();
+            abrirModal(data)
+        })
+        function Guardar()
+        {
+            var Usuario =
+            {
+                IdUsuario: $("#txtId").val(),
+                Nombres: $("#txtNombres").val(),
+                Apellidos: $("#txtApellidos").val(),
+                Correo: $("#txtCorreo").val(),
+                Activo: $("#cboActivo").val() == 1 ? true:false
+            }
+            if (Usuario.IdUsuario == 0)
+            {
+                tablaData.row.add(Usuario).draw(false)
+            }
+            else
+            {
+                tabal.row(filaSeleccionada).data(Usuario).draw(false)
+            }
+            $("#FormModal").modal("hide");
+        }
     </script>
-    } 
+} 

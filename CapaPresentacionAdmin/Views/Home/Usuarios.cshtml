@@ -46,20 +46,20 @@
                 <h5 class="modal-title" id="exampleModalLabel">Usuario</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body g-2">
+            <div class="modal-body">
                 <input id="txtId" type="hidden" value="0"/>
-                <div class="row">
+                <div class="row g-2">
                     <div class="col-sm-6">
                         <label for="txtNombres" class="form-label">Nombres</label>
-                        <input type="text" class="form-control" id="txtNombres" placeholder="Digite solo su nombre">
+                        <input type="text" class="form-control" id="txtNombres" placeholder="Digite solo su nombre" autocomplete="off">
                     </div>
                     <div class="col-sm-6">
                         <label for="txtApellidos" class="form-label">Apellidos</label>
-                        <input type="text" class="form-control" id="txtApellidos" placeholder="Digite solo su apellido">
+                        <input type="text" class="form-control" id="txtApellidos" placeholder="Digite solo su apellido" autocomplete="off">
                     </div>
                     <div class="col-sm-6">
                         <label for="txtCorreo" class="form-label">Correo</label>
-                        <input type="email" class="form-control" id="txtCorreo" placeholder="Prueba@email.com">
+                        <input type="email" class="form-control" id="txtCorreo" placeholder="Prueba@email.com" autocomplete="off">
                     </div>
                     <div class="col-sm-6">
                         <label for="cboActivo" class="form-label">Usuario Activo</label>
@@ -68,6 +68,13 @@
                             <option value="1">Si</option>
                             <option value="0">No</option>
                         </select>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <div id="MensajeError" class="alert alert-danger" role="alert">
+                                A simple danger alert—check it out!
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -126,6 +133,7 @@
                 "url":"https://cdn.datatables.net/plug-ins/2.1.4/i18n/es-MX.json"
             }
         });
+
         function abrirModal(json)
         {
             $("#txtId").val(0);
@@ -133,6 +141,8 @@
             $("#txtApellidos").val("");
             $("#txtCorreo").val("");
             $("#cboActivo").val(1);
+            $("#MensajeError").hide();
+            
 
             if (json != null)
             {
@@ -150,6 +160,7 @@
             var data = tablaData.row(filaSeleccionada).data();
             abrirModal(data)
         })
+
         function Guardar()
         {
             var Usuario =
@@ -160,15 +171,50 @@
                 Correo: $("#txtCorreo").val(),
                 Activo: $("#cboActivo").val() == 1 ? true:false
             }
-            if (Usuario.IdUsuario == 0)
-            {
-                tablaData.row.add(Usuario).draw(false)
-            }
-            else
-            {
-                tabal.row(filaSeleccionada).data(Usuario).draw(false)
-            }
-            $("#FormModal").modal("hide");
+
+            jQuery.ajax({
+                url:'@Url.Action("GuardarUsuario", "Home")',
+                type: "POST",
+                data: JSON.stringify({ objeto: Usuario }),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    //Usuario Nuevo
+                    if (Usuario.IdUsuario == 0)
+                    {
+                        if (data.resultado != 0)
+                        {
+                            Usuario.IdUsuario = data.resultado;
+                            tablaData.row.add(Usuario).draw(false);
+                            $("#FormModal").modal("hide");
+                        }
+                        else
+                        {
+                            $("#MensajeError").text(data.mensaje);
+                            $("#MensajeError").show();
+                        }
+                    }
+                    //Usuario Editado
+                    else {
+                        if (data.resultado)
+                        {
+                            tablaData.row(filaSeleccionada).data(Usuario).draw(false);
+                            filaSeleccionada = null;
+                            $("#FormModal").modal("hide");
+                        }
+                        else {
+                            $("#MensajeError").text(data.mensaje);
+                            $("#MensajeError").show();
+                        }
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+                beforeSend: function () {
+                },
+            })
+            
         }
     </script>
 } 

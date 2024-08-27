@@ -23,15 +23,16 @@ namespace CapaNegocio
             {
                 Mensaje = "El nombre del usuario no puede ser vacio";
             }
-            if (string.IsNullOrEmpty(obj.Apellidos) || string.IsNullOrWhiteSpace(obj.Apellidos))
+            else if (string.IsNullOrEmpty(obj.Apellidos) || string.IsNullOrWhiteSpace(obj.Apellidos))
             {
                 Mensaje = "El apellido del usuario no puede ser vacio";
             }
-            if (string.IsNullOrEmpty(obj.Correo) || string.IsNullOrWhiteSpace(obj.Correo))
+            else if (string.IsNullOrEmpty(obj.Correo) || string.IsNullOrWhiteSpace(obj.Correo))
             {
                 Mensaje = "El correo del usuario no puede ser vacio";
             }
-            if (string.IsNullOrWhiteSpace(Mensaje))
+            
+            if (string.IsNullOrEmpty(Mensaje))
             {
                 string clave = "test123";
                 obj.Clave = CN_Recursos.ConvertirSha256(clave);
@@ -49,15 +50,16 @@ namespace CapaNegocio
             {
                 Mensaje = "El nombre del usuario no puede ser vacio";
             }
-            if (string.IsNullOrEmpty(obj.Apellidos) || string.IsNullOrWhiteSpace(obj.Apellidos))
+            else if (string.IsNullOrEmpty(obj.Apellidos) || string.IsNullOrWhiteSpace(obj.Apellidos))
             {
                 Mensaje = "El apellido del usuario no puede ser vacio";
             }
-            if (string.IsNullOrEmpty(obj.Correo) || string.IsNullOrWhiteSpace(obj.Correo))
+            else if (string.IsNullOrEmpty(obj.Correo) || string.IsNullOrWhiteSpace(obj.Correo))
             {
                 Mensaje = "El correo del usuario no puede ser vacio";
             }
-            if (string.IsNullOrWhiteSpace(Mensaje))
+
+            if (string.IsNullOrEmpty(Mensaje))
             {
                 return objCapaDato.Editar(obj, out Mensaje);
             }
